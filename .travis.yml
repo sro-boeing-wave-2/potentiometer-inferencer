@@ -1,0 +1,8 @@
+sudo: false
+language: node_js
+node_js:
+  - "8.3"
+script:
+  - echo "No Tests"
+after_success:
+  - /bin/bash ./deploy.sh

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>Potentiometer Inferencer</title>
+		<meta name="description" content="Natural Language Form with custom text input and drop-down lists" />
+		<meta name="keywords" content="Natural Language UI, sentence form, text input, contenteditable, html5, css3, jquery" />
+		<meta name="author" content="Codrops" />
+		<link rel="shortcut icon" href="../favicon.ico"> 
+		<link rel="stylesheet" type="text/css" href="css/default.css" />
+		<link rel="stylesheet" type="text/css" href="css/component.css" />
+    <script src="js/modernizr.custom.js"></script>
+    <link rel="stylesheet" type="text/css" href="./node_modules/fullpage.js/dist/fullpage.min.css" />
+    <link rel="stylesheet" href="./css/styles.css">
+    <base href="/inferencer/">
+	</head>
+	<body class="nl-blurred">
+		<div class="container demo-1">
+			<header>
+				<h1>Potentiometer Inference<span>powered by knowledge</span></h1>	
+      </header>
+      <div id="fullpage">
+        <div class="main clearfix section">
+          <div id="nl-form" class="nl-form">
+            What concepts am I good at, in
+            <select id="domains">
+              <option value="1" selected>CSharp</option>
+              <option value="2">NodeJS</option>
+              <option value="3">AngularJS</option>
+              <option value="4">ExpressJS</option>
+              <option value="2">Java</option>
+            </select> domain.
+            <div class="nl-submit-wrap">
+              <button id="findHowGoodIAmInADomain" class="nl-submit">Can you help me finding that?</button>
+            </div>
+            <div class="nl-overlay"></div>
+          </div>
+        </div>
+        
+        <div class="main clear section">
+          <div class="nl-form" id="answerToHowGoodIAmInADomain">
+          </div>
+        </div>
+
+        <div class="main clearfix section">
+          <div class="nl-form">
+            My mom says, I am a Rockstar and can do wonders. I too feel so.
+            <div class="nl-submit-wrap">
+              <button class="nl-submit" id="whatDomainsAmIGoodAt" type="submit">What do you think am I good at?</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="main clearfix section">
+          <div class="nl-form" id="answerToWhatDomainsAmIGoodAt"></div>
+        </div>
+        
+        <div class="main clearfix section">
+          <div class="nl-form">
+            Okay, there's no limit to human's ability. But it's quite awesome knowing what you am I good at.
+            <div class="nl-submit-wrap">
+              <button id="whatTaxonomiesAmIGoodAt" class="nl-submit">Do you have any insights?</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="main clearfix section">
+          <div class="nl-form" id="answerToWhatTaxonomiesAmIGoodAt"></div>
+        </div>
+      </div>
+    
+    <script src="js/nlform.js"></script>
+    <script src="./node_modules/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="./node_modules/fullpage.js/dist/fullpage.js"></script>
+		<script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userid');
+      console.log(userId);
+      const baseUrl = "http://13.126.26.172";
+
+      const findHowGoodIAmInADomain = () => {
+        const domains = document.getElementById("domains");
+        const domain = domains.options[domains.selectedIndex].text;
+        axios
+          .get(`http://13.126.26.172/api/inference/top/user/concepts/${domain}/${userId}`)
+          .then((response) => {
+            console.log(response.data);
+            const concepts = response.data.sort((a, b) => b.intensity - a.intensity);
+            if (concepts[0] && concepts[1]) {
+              document.getElementById('answerToHowGoodIAmInADomain').innerHTML = `Seems like you are good in concepts <span class="nl-field-toggle">${concepts[0].concept}</span> and <span class="nl-field-toggle">${concepts[1].concept}</span> in <span class="nl-field-toggle">${domain}</span> domain.`;
+            } else if (concepts[0]) {
+              document.getElementById('answerToHowGoodIAmInADomain').innerHTML = `Seems like you are doing in concept <span class="nl-field-toggle">${concepts[0].concept}</span> in <span class="nl-field-toggle">${domain}</span> domain.`;
+            } else {
+              document.getElementById('answerToHowGoodIAmInADomain').innerHTML = `Oops! I am sorry Couldn't really find that.`;
+            }
+            fullpageApi.moveSectionDown();
+          }).catch(() => {
+            document.getElementById('answerToHowGoodIAmInADomain').innerHTML = `Oops! I am sorry Couldn't really find that.`;
+            fullpageApi.moveSectionDown();
+          })
+      };
+
+      const taxonomyMapper = {
+        'Analyze': 'in breaking down information into component parts',
+        'Apply': 'in applying the facts, rules, concepts and ideas',
+        'Understand': 'in understanding what the facts mean',
+        'Evaluate': 'in judging the value of information or ideas',
+        'Remember': 'in recognizing and recalling facts',
+        'Create': 'in combinging parts to make a new whole', 
+      }; 
+    
+      const whatDomainsAmIGoodAt = () => {
+        try {
+          axios
+            .get(`http://13.126.26.172/api/inference/top/user/domain/${userId}`)
+            .then((response) => {
+              const domains = response.data.sort((a, b) => b.intensity - a.intensity);
+              const domainNames = domains.map(d => d.domain);
+              if (domainNames[0] && domainNames[1]) {
+                document.getElementById('answerToWhatDomainsAmIGoodAt').innerHTML = `No doub't, you're a Rockstar. But your core strengths are in <span class="nl-field-toggle">${domainNames[0]}</span> and <span class="nl-field-toggle">${domainNames[1]}</span>.`;
+              } else if (domainNames[0]) {
+                document.getElementById('answerToWhatDomainsAmIGoodAt').innerHTML = `No doub't, you are a Rockstar. But your core strength is in <span class="nl-field-toggle">${domainNames[0]}</span>.`;
+              } else {
+                document.getElementById('answerToWhatDomainsAmIGoodAt').innerHTML = `Couldn't really find that :(`;
+              }
+              fullpageApi.moveSectionDown();
+            })
+            .catch((error) => {
+              console.log("err", error);
+              document.getElementById('answerToWhatDomainsAmIGoodAt').innerHTML = `Oops! I am sorry Couldn't really find that.`;
+              fullpageApi.moveSectionDown();
+            })
+        } catch (error) {
+          document.getElementById('answerToHowGoodIAmInADomain').innerHTML = `Oops! I am sorry Couldn't really find that.`;
+          fullpageApi.moveSectionDown();
+        }
+      };
+
+      const whatTaxonomiesAmIGoodAt = () => {
+        axios
+          .get(`http://13.126.26.172/api/inference/top/user/taxonomy/${userId}`)
+          .then((response) => {
+            const taxonomies = response.data.sort((a, b) => b.intensity - a.intensity);
+            if (taxonomies[0]) {
+              console.log(taxonomies[0]);
+             document.getElementById('answerToWhatTaxonomiesAmIGoodAt').innerHTML = `Look's like you're great <span class="nl-field-toggle">${taxonomyMapper[taxonomies[0].taxonomy]}</span>`;
+            } else {
+              document.getElementById('answerToWhatTaxonomiesAmIGoodAt').innerHTML = `Couldn't really figure that out :(.`;
+            }
+            fullpageApi.moveSectionDown();
+          })
+          .catch(() => {
+            document.getElementById('answerToWhatTaxonomiesAmIGoodAt').innerHTML = `Couldn't really figure that out :(.`;
+            fullpageApi.moveSectionDown();
+          });
+      };
+      
+      document.getElementById('whatTaxonomiesAmIGoodAt').onclick = whatTaxonomiesAmIGoodAt;
+      document.getElementById('whatDomainsAmIGoodAt').onclick = whatDomainsAmIGoodAt;
+      document.getElementById('findHowGoodIAmInADomain').onclick = findHowGoodIAmInADomain;
+      
+      const fullpageApi = new fullpage('#fullpage', {
+        licenseKey: 'OPEN-SOURCE-GPLV3-LICENSE',
+        autoScrolling: true,
+      });
+      var nlform = new NLForm( document.getElementById( 'nl-form' ) );
+    </script>
+	</body>
+</html>

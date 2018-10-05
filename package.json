@@ -1,0 +1,19 @@
+{
+  "name": "potentiometer-inferencer",
+  "version": "1.0.0",
+  "description": "```\r # Installs all the bower dependencies\r bower install",
+  "main": "index.js",
+  "scripts": {
+    "start": "./node_modules/.bin/http-server . -p 80 -a 0.0.0.0",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "fullpage.js": "^3.0.3"
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
