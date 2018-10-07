@@ -3,4 +3,4 @@ services:
   web:
     build: .
     labels:
-      - SERVICE_80_NAME: inferencer
+      - "SERVICE_80_NAME=inferencer"
