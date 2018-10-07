@@ -2,5 +2,5 @@ version: '3'
 services:
   web:
     build: .
-    ports:
-      - "8090:80"
+    labels:
+      - SERVICE_80_NAME: inferencer
